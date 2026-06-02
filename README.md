@@ -1,5 +1,7 @@
 # Peningkatan Kualitas Foto Jadul Menggunakan Histogram Equalization (HE) vs CLAHE
 
+---
+
 ## Deskripsi Singkat
 
 Script ini membandingkan dua metode klasik peningkatan kontras citra untuk
