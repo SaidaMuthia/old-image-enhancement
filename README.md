@@ -1,6 +1,5 @@
-# Peningkatan Kualitas Foto Jadul
-## Histogram Equalization (HE) vs CLAHE
-### Tugas Project — Mata Kuliah Visi Komputer 2025/2026
+# Peningkatan Kualitas Foto Jadul Menggunakan Histogram Equalization (HE) vs CLAHE
+### Tugas Project — Mata Kuliah Visi Komputer
 
 ---
 
