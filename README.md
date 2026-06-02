@@ -1,5 +1,4 @@
 # Peningkatan Kualitas Foto Jadul Menggunakan Histogram Equalization (HE) vs CLAHE
-### Tugas Project — Mata Kuliah Visi Komputer
 
 ---
 
