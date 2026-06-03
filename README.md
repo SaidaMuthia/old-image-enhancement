@@ -1,42 +1,43 @@
-# Peningkatan Kualitas Foto Jadul Menggunakan Histogram Equalization (HE) vs CLAHE
+# Restorasi Citra Foto Jadul Berwarna Menggunakan Koreksi Warna dan CLAHE
 
 ---
 
-## Deskripsi Singkat
+## Deskripsi
 
-Script ini membandingkan dua metode klasik peningkatan kontras citra untuk
-merestorasi foto jadul berwarna yang mengalami:
-- **Color fading** (warna memudar ke arah kemerahan)
-- **Kontras rendah** (detail sulit dibedakan)
+Program ini melakukan restorasi foto jadul berwarna yang mengalami dua
+permasalahan utama secara bersamaan:
 
-**Metode yang digunakan:**
-1. **Histogram Equalization (HE)** — pemerataan distribusi intensitas secara global
-2. **CLAHE** — HE adaptif per blok dengan pembatasan amplifikasi kontras
+1. **Color fading** — pemudaran warna ke arah kemerahan akibat
+   degradasi kimiawi pigmen foto.
+2. **Kontras rendah** — detail pada area gelap maupun terang sulit
+   dibedakan.
 
-Pemrosesan dilakukan pada **channel L (Lightness)** di ruang warna LAB
-agar warna asli foto tidak terdistorsi.
+Pendekatan yang digunakan adalah pipeline dua tahap berbasis teknik
+pemrosesan citra klasik:
 
-> ⚠️ Tidak menggunakan library deep learning (TensorFlow, PyTorch, Keras, dll.)
+| Tahap | Metode | Tujuan |
+|-------|--------|--------|
+| 1 | Gray World Assumption | Menetralisir dominasi warna kemerahan |
+| 2 | CLAHE (pada channel L LAB) | Meningkatkan kontras tanpa mendistorsi warna |
+
+Program ini **tidak menggunakan library deep learning** (TensorFlow,
+PyTorch, Keras, dll.) sesuai ketentuan tugas.
 
 ---
 
 ## Struktur Folder
 
 ```
-project_visi_komputer/
-├── main.py            # Script utama
-├── requirements.txt   # Daftar library yang dibutuhkan
-├── README.md          # File ini
-└── images/            # Letakkan foto input di sini
-    └── gambar_jadul.jpg   # (contoh nama file input)
-```
-
-Setelah dijalankan, hasil akan tersimpan di folder `output/`:
-```
-output/
-├── hasil_he.jpg             # Foto hasil Histogram Equalization
-├── hasil_clahe.jpg          # Foto hasil CLAHE
-└── hasil_perbandingan.png   # Visualisasi perbandingan + histogram
+old-image-enhancement/
+├── main.py             # Script utama
+├── requirements.txt    # Daftar library yang dibutuhkan
+├── README.md           # File ini
+├── images/             # Folder untuk foto input
+│   └── gambar_jadul.jpg
+└── output/             # Folder hasil (dibuat otomatis)
+    ├── hasil_tahap1_koreksi_warna.jpg
+    ├── hasil_tahap2_clahe_final.jpg
+    └── hasil_perbandingan.png
 ```
 
 ---
@@ -48,25 +49,21 @@ output/
 
 ---
 
-## Cara Instalasi
+## Instalasi
 
-### 1. Clone / Download Project
-
-Pastikan semua file project sudah ada di satu folder.
-
-### 2. (Opsional) Buat Virtual Environment
+### 1. (Opsional) Buat Virtual Environment
 
 ```bash
 python -m venv venv
 
-# Aktifkan (Windows):
+# Aktifkan (Windows)
 venv\Scripts\activate
 
-# Aktifkan (Mac/Linux):
+# Aktifkan (Mac/Linux)
 source venv/bin/activate
 ```
 
-### 3. Install Library
+### 2. Install Dependencies
 
 ```bash
 pip install -r requirements.txt
@@ -76,84 +73,72 @@ pip install -r requirements.txt
 
 ## Cara Menjalankan
 
-### Format Perintah
+### Perintah Dasar
 
 ```bash
-python main.py <path_gambar> [--output_dir <folder>] [--clip_limit <nilai>] [--tile_size <nilai>]
+python main.py images/gambar_jadul.jpg
 ```
 
-### Contoh Paling Sederhana
-
-Letakkan foto jadul di folder `images/`, lalu jalankan:
+### Dengan Parameter Custom
 
 ```bash
-python main.py images/foto_gua.jpg
+python main.py images/gambar_jadul.jpg --output_dir output --clip_limit 2.0 --tile_size 8
 ```
 
-Hasil akan tersimpan otomatis di folder `output/`.
+### Parameter yang Tersedia
 
-### Contoh dengan Parameter Custom
-
-```bash
-python main.py images/foto_gua.jpg --output_dir hasil_saya --clip_limit 3.0 --tile_size 16
-```
-
-### Penjelasan Parameter
-
-| Parameter       | Default  | Keterangan                                              |
-|-----------------|----------|---------------------------------------------------------|
-| `input`         | (wajib)  | Path ke foto input                                      |
-| `--output_dir`  | `output` | Folder penyimpanan hasil                                |
-| `--clip_limit`  | `2.0`    | Batas amplifikasi kontras CLAHE (nilai lebih tinggi = lebih agresif) |
-| `--tile_size`   | `8`      | Ukuran blok tile CLAHE dalam piksel (harus pembagi lebar/tinggi gambar) |
+| Parameter      | Default  | Keterangan |
+|----------------|----------|------------|
+| `input`        | (wajib)  | Path ke foto input |
+| `--output_dir` | `output` | Folder penyimpanan hasil |
+| `--clip_limit` | `2.0`    | Batas amplifikasi kontras CLAHE |
+| `--tile_size`  | `8`      | Ukuran blok CLAHE dalam piksel |
 
 ---
 
 ## Output yang Dihasilkan
 
 ### File Gambar
-- `hasil_he.jpg` — Foto hasil Histogram Equalization
-- `hasil_clahe.jpg` — Foto hasil CLAHE
-- `hasil_perbandingan.png` — Visualisasi 2x3 berisi:
-  - Baris atas: foto asli | hasil HE | hasil CLAHE
-  - Baris bawah: histogram channel L masing-masing
+
+- `hasil_tahap1_koreksi_warna.jpg` — Foto setelah koreksi warna Gray World
+- `hasil_tahap2_clahe_final.jpg` — Foto final setelah CLAHE diterapkan
+- `hasil_perbandingan.png` — Visualisasi 2x3 (citra + histogram channel L)
 
 ### Output Terminal
 
-Script akan mencetak tabel metrik kuantitatif, contoh:
+Program mencetak tabel metrik kuantitatif, contoh:
 
 ```
-=======================================================
-               METRIK KUANTITATIF
-=======================================================
-Metrik                              HE          CLAHE
--------------------------------------------------------
-Std Dev Histogram (L)            67.45         54.32
-PSNR vs Original (dB)            18.23         22.17
-=======================================================
-  Std Dev Original : 28.11
-  [Std Dev lebih tinggi = kontras lebih baik]
-  [PSNR lebih tinggi = perubahan lebih halus dari asli]
-=======================================================
+======================================================================
+                          METRIK KUANTITATIF
+======================================================================
+Metrik                          Original   Koreksi Warna       Final
+----------------------------------------------------------------------
+Std Dev Channel L                  39.16           41.68       52.00
+Color Cast Index                   42.41            0.02        0.36
+PSNR vs Original (dB)                  —           22.65       19.86
+======================================================================
 ```
 
 ---
 
 ## Catatan Teknis
 
-- Pemrosesan menggunakan ruang warna **LAB** agar channel warna (a, b)
-  tidak diubah — hanya channel **L (luminance)** yang diproses.
-- HE menggunakan rumus: `s = round((L-1) × CDF(r))`
-- CLAHE menggunakan clip limit per tile: `C_l = clip_limit × (T×T) / 256`
-- Tidak ada dependency deep learning sama sekali.
+- **Ruang warna LAB** digunakan agar CLAHE hanya memodifikasi
+  kecerahan (channel L), bukan warna (channel a dan b).
+- **Gray World Assumption** mengasumsikan bahwa rata-rata warna pada
+  citra natural seharusnya netral (abu-abu).
+- Rumus skala per channel:
+  `scale_c = gray_mean / mean_c` untuk `c` dalam `{B, G, R}`
+- Rumus clip limit per tile CLAHE:
+  `C_l = clip_limit * (T * T) / L`
 
 ---
 
 ## Troubleshooting
 
 | Masalah | Solusi |
-|--------|--------|
-| `FileNotFoundError: Gambar tidak ditemukan` | Pastikan path gambar benar dan file ada |
-| `ModuleNotFoundError: No module named 'cv2'` | Jalankan `pip install opencv-python` |
-| Hasil terlalu terang/gelap | Turunkan/naikkan `--clip_limit` |
-| Gambar output tampak berbeda dari preview | Normal — matplotlib menampilkan RGB, file disimpan BGR (OpenCV) |
+|---------|--------|
+| `FileNotFoundError: Gambar tidak ditemukan` | Cek kembali path gambar input |
+| `ModuleNotFoundError: No module named 'cv2'` | Jalankan `pip install -r requirements.txt` |
+| Hasil terlalu terang/gelap | Sesuaikan `--clip_limit` (kecil = subtle, besar = agresif) |
