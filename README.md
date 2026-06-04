@@ -1,9 +1,9 @@
-# Restorasi Citra Foto Jadul Berwarna Menggunakan Koreksi Warna dan CLAHE
+# Peningkatan Citra Foto Jadul Berwarna Menggunakan Koreksi Warna dan CLAHE
 ---
 
 ## Deskripsi
 
-Program ini melakukan restorasi foto jadul berwarna yang mengalami dua
+Program ini melakukan peningkatan foto jadul berwarna yang mengalami dua
 permasalahan utama secara bersamaan:
 
 1. **Color fading** — pemudaran warna ke arah kemerahan akibat
@@ -28,7 +28,7 @@ PyTorch, Keras, dll.) sesuai ketentuan tugas.
 
 ```
 old-image-enhancement/
-├── main.py                    # Pipeline restorasi utama
+├── main.py                    # Pipeline utama
 ├── eksperimen_parameter.py    # Eksperimen variasi parameter CLAHE
 ├── requirements.txt           # Daftar library yang dibutuhkan
 ├── README.md                  # File ini
