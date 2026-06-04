@@ -1,5 +1,4 @@
 # Restorasi Citra Foto Jadul Berwarna Menggunakan Koreksi Warna dan CLAHE
-
 ---
 
 ## Deskripsi
@@ -29,15 +28,18 @@ PyTorch, Keras, dll.) sesuai ketentuan tugas.
 
 ```
 old-image-enhancement/
-├── main.py             # Script utama
-├── requirements.txt    # Daftar library yang dibutuhkan
-├── README.md           # File ini
-├── images/             # Folder untuk foto input
+├── main.py                    # Pipeline restorasi utama
+├── eksperimen_parameter.py    # Eksperimen variasi parameter CLAHE
+├── requirements.txt           # Daftar library yang dibutuhkan
+├── README.md                  # File ini
+├── images/                    # Folder untuk foto input
 │   └── gambar_jadul.jpg
-└── output/             # Folder hasil (dibuat otomatis)
+└── output/                    # Folder hasil (dibuat otomatis)
     ├── hasil_tahap1_koreksi_warna.jpg
     ├── hasil_tahap2_clahe_final.jpg
-    └── hasil_perbandingan.png
+    ├── hasil_perbandingan.png
+    ├── eksperimen_clip_limit.png
+    └── eksperimen_tile_size.png
 ```
 
 ---
@@ -93,6 +95,22 @@ python main.py images/gambar_jadul.jpg --output_dir output --clip_limit 2.0 --ti
 | `--output_dir` | `output` | Folder penyimpanan hasil |
 | `--clip_limit` | `2.0`    | Batas amplifikasi kontras CLAHE |
 | `--tile_size`  | `8`      | Ukuran blok CLAHE dalam piksel |
+
+---
+
+## Menjalankan Eksperimen Parameter
+
+Script `eksperimen_parameter.py` menguji berbagai nilai `clip_limit` dan
+`tileGridSize` untuk memvalidasi pemilihan parameter default pada `main.py`.
+
+```bash
+python eksperimen_parameter.py images/gambar_jadul.jpg
+```
+
+Output yang dihasilkan:
+- Tabel metrik di terminal untuk tiap variasi parameter
+- `output/eksperimen_clip_limit.png` — grid visual variasi clip_limit
+- `output/eksperimen_tile_size.png` — grid visual variasi tileGridSize
 
 ---
 
