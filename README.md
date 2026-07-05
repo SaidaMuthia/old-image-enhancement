@@ -1,16 +1,13 @@
-# Peningkatan Citra Foto Jadul Berwarna Menggunakan Koreksi Warna dan CLAHE
+# Restorasi Citra Foto Jadul Berwarna Menggunakan Koreksi Warna dan CLAHE
 
 ---
 
 ## Deskripsi
 
-Program ini melakukan restorasi foto jadul berwarna yang mengalami dua
-permasalahan utama secara bersamaan:
+Program ini melakukan restorasi foto jadul berwarna yang mengalami dua permasalahan utama:
 
-1. **Color fading** — pemudaran warna ke arah kemerahan akibat
-   degradasi kimiawi pigmen foto.
-2. **Kontras rendah** — detail pada area gelap maupun terang sulit
-   dibedakan.
+1. **Color fading** — pemudaran warna ke arah kemerahan akibat degradasi kimiawi pigmen foto.
+2. **Kontras rendah** — detail pada area gelap maupun terang sulit dibedakan.
 
 Pipeline dua tahap berbasis teknik pemrosesan citra klasik:
 
@@ -19,9 +16,11 @@ Pipeline dua tahap berbasis teknik pemrosesan citra klasik:
 | 1 | Gray World Assumption | Menetralisir dominasi warna kemerahan |
 | 2 | CLAHE pada channel L (CIE L\*a\*b\*) | Meningkatkan kontras tanpa mendistorsi warna |
 
-Seluruh algoritma diimplementasi menggunakan NumPy tanpa library
-pemrosesan citra khusus. Program **tidak menggunakan** OpenCV, TensorFlow,
-PyTorch, Keras, atau library deep learning lainnya.
+CLAHE diterapkan pada **channel L** (kecerahan) dalam ruang warna LAB — bukan pada grayscale
+maupun langsung pada channel RGB — agar informasi warna pada channel a dan b tetap terjaga
+setelah konversi balik ke RGB.
+
+Seluruh algoritma diimplementasi menggunakan NumPy tanpa library pemrosesan citra khusus.
 
 ---
 
@@ -29,13 +28,13 @@ PyTorch, Keras, atau library deep learning lainnya.
 
 ```
 old-image-enhancement/
-├── main.py                    # Pipeline restorasi utama
-├── eksperimen_parameter.py    # Eksperimen variasi parameter CLAHE
-├── requirements.txt           # Daftar library yang dibutuhkan
-├── README.md                  # File ini
+├── main.py                     # Pipeline restorasi utama
+├── eksperimen_parameter.py     # Eksperimen variasi parameter CLAHE
+├── requirements.txt
+├── README.md
 ├── images/
 │   └── gambar_jadul.jpg
-└── output/
+└── output/                     # Dihasilkan saat program dijalankan
     ├── hasil_tahap1_koreksi_warna.jpg
     ├── hasil_tahap2_clahe_final.jpg
     ├── hasil_perbandingan.png
@@ -45,30 +44,20 @@ old-image-enhancement/
 
 ---
 
-## Persyaratan Sistem
+## Persyaratan
 
 - Python 3.8 atau lebih baru
-- pip (Python package manager)
 
 ---
 
 ## Instalasi
 
-### 1. (Opsional) Buat Virtual Environment
-
 ```bash
+# (Opsional) buat virtual environment
 python -m venv venv
+source venv/bin/activate        # Mac/Linux
+venv\Scripts\activate           # Windows
 
-# Windows
-venv\Scripts\activate
-
-# Mac/Linux
-source venv/bin/activate
-```
-
-### 2. Install Dependencies
-
-```bash
 pip install -r requirements.txt
 ```
 
@@ -85,52 +74,40 @@ python main.py images/gambar_jadul.jpg
 ### Dengan Parameter Custom
 
 ```bash
-python main.py images/gambar_jadul.jpg --output_dir output --clip_limit 2.0 --tile_size 8
+python main.py images/gambar_jadul.jpg --clip_limit 2.0 --tile_size 8
 ```
-
-### Parameter
 
 | Parameter      | Default  | Keterangan |
 |----------------|----------|------------|
 | `input`        | (wajib)  | Path ke foto input |
 | `--output_dir` | `output` | Folder penyimpanan hasil |
-| `--clip_limit` | `2.0`    | Batas amplifikasi kontras CLAHE |
-| `--tile_size`  | `8`      | Jumlah grid tile CLAHE per sisi |
+| `--clip_limit` | `2.0`    | Batas amplifikasi kontras CLAHE per tile |
+| `--tile_size`  | `8`      | Jumlah grid tile CLAHE per sisi (8 = grid 8×8) |
 
 ---
 
-## Menjalankan Eksperimen Parameter
+## Eksperimen Variasi Parameter
 
-Script `eksperimen_parameter.py` menguji berbagai nilai `clip_limit` dan
-`tile_size` untuk memvalidasi pemilihan parameter default.
+Untuk memvalidasi pemilihan `clip_limit=2.0` dan `tile_size=8`:
 
 ```bash
 python eksperimen_parameter.py images/gambar_jadul.jpg
 ```
 
-Output yang dihasilkan:
-- Tabel metrik di terminal untuk tiap variasi parameter
+Output:
+- Tabel analisis per variasi parameter di terminal
 - `output/eksperimen_clip_limit.png`
 - `output/eksperimen_tile_size.png`
 
 ---
 
-## Output
+## Output Utama
 
-- `hasil_tahap1_koreksi_warna.jpg` — Setelah koreksi warna Gray World
-- `hasil_tahap2_clahe_final.jpg` — Setelah CLAHE (hasil final)
-- `hasil_perbandingan.png` — Visualisasi 2x3 beserta histogram channel L
-
----
-
-## Catatan Teknis
-
-- Konversi ruang warna sRGB ke CIE L\*a\*b\* dan sebaliknya diimplementasi
-  manual menggunakan transformasi matriks RGB-XYZ (illuminan D65) dan
-  fungsi non-linear CIE.
-- CLAHE diimplementasi manual: histogram per tile, clip limit, redistribusi
-  piksel terpotong, ekualisasi berbasis CDF, dan interpolasi bilinear antar tile.
-- Gray World Assumption diimplementasi dengan operasi NumPy dasar.
+| File | Deskripsi |
+|------|-----------|
+| `hasil_tahap1_koreksi_warna.jpg` | Hasil setelah Gray World Assumption |
+| `hasil_tahap2_clahe_final.jpg`   | Hasil final setelah CLAHE |
+| `hasil_perbandingan.png`         | Visualisasi 2×3 dengan histogram channel L |
 
 ---
 
@@ -138,6 +115,6 @@ Output yang dihasilkan:
 
 | Masalah | Solusi |
 |---------|--------|
-| `FileNotFoundError` | Cek kembali path gambar input |
+| `FileNotFoundError` | Periksa path gambar input |
 | `ModuleNotFoundError` | Jalankan `pip install -r requirements.txt` |
-| Hasil terlalu terang/gelap | Sesuaikan `--clip_limit` |
+| Hasil terlalu terang/gelap | Turunkan/naikkan `--clip_limit` |
